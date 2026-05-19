@@ -1,6 +1,6 @@
 {
   "name": "luma-registration-bot",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Автоматизация регистрации аккаунтов: Playwright + AdsPower + Capsolver + GMX IMAP + Electron UI",
   "main": "electron/main.js",
   "scripts": {
