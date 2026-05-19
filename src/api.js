@@ -219,16 +219,26 @@ function startWorker({ count, concurrency, headless }) {
   }
 
   // В Electron process.execPath = Luma Registration Bot.exe, а не node.exe
-  // Ищем node.exe рядом с exe или в PATH
+  // Используем известный путь к node.exe или ищем в PATH
   let nodePath = process.execPath;
-  if (nodePath.toLowerCase().includes('luma') || nodePath.toLowerCase().includes('electron')) {
-    // Пробуем найти node.exe в PATH
-    const { execSync } = require('child_process');
-    try {
-      nodePath = execSync('where node', { encoding: 'utf8' }).trim().split('\n')[0].trim();
-    } catch {
-      nodePath = 'node'; // fallback — надеемся что node в PATH
+  if (nodePath.toLowerCase().includes('luma') || nodePath.toLowerCase().includes('electron') || nodePath.toLowerCase().includes('registration')) {
+    // Список известных путей к node.exe
+    const candidates = [
+      'C:\\Program Files\\nodejs\\node.exe',
+      'C:\\Program Files (x86)\\nodejs\\node.exe',
+      process.env.NODE_PATH,
+      process.env.NVM_SYMLINK,
+    ].filter(Boolean);
+
+    let found = false;
+    for (const candidate of candidates) {
+      if (fs.existsSync(candidate)) {
+        nodePath = candidate;
+        found = true;
+        break;
+      }
     }
+    if (!found) nodePath = 'node'; // fallback
   }
 
   const proc = spawn(nodePath, [indexJs], {
