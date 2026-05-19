@@ -218,7 +218,20 @@ function startWorker({ count, concurrency, headless }) {
     return { ok: false, error: workerState.lastError };
   }
 
-  const proc = spawn(process.execPath, [indexJs], {
+  // В Electron process.execPath = Luma Registration Bot.exe, а не node.exe
+  // Ищем node.exe рядом с exe или в PATH
+  let nodePath = process.execPath;
+  if (nodePath.toLowerCase().includes('luma') || nodePath.toLowerCase().includes('electron')) {
+    // Пробуем найти node.exe в PATH
+    const { execSync } = require('child_process');
+    try {
+      nodePath = execSync('where node', { encoding: 'utf8' }).trim().split('\n')[0].trim();
+    } catch {
+      nodePath = 'node'; // fallback — надеемся что node в PATH
+    }
+  }
+
+  const proc = spawn(nodePath, [indexJs], {
     cwd: ROOT_DIR,
     env,
     stdio: ['ignore', 'pipe', 'pipe'],
