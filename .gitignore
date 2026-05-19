@@ -1,0 +1,10 @@
+node_modules/
+.env
+logs/
+screenshots/
+cookies/
+*.db
+*.db-shm
+*.db-wal
+park.js
+unpark.js
