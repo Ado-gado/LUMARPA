@@ -1,0 +1,89 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html, body, #root { height: 100%; }
+  body {
+    background: #0f0f0f;
+    color: #e0e0e0;
+    font-family: Inter, "Segoe UI", system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  ::-webkit-scrollbar { width: 10px; height: 10px; }
+  ::-webkit-scrollbar-track { background: #0f0f0f; }
+  ::-webkit-scrollbar-thumb { background: #2a2a2a; border-radius: 0; }
+  ::-webkit-scrollbar-thumb:hover { background: #3a3a3a; }
+}
+
+@layer components {
+  .card {
+    @apply bg-panel border border-border rounded-md;
+  }
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 px-3 py-1.5 text-sm
+           border border-border bg-panel2 hover:bg-panel rounded-sm
+           transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+  .btn-primary {
+    @apply btn border-accent/40 bg-accent/10 text-accent hover:bg-accent/20;
+  }
+  .btn-success {
+    @apply btn border-success/40 bg-success/10 text-success hover:bg-success/20;
+  }
+  .btn-danger {
+    @apply btn border-danger/40 bg-danger/10 text-danger hover:bg-danger/20;
+  }
+  .btn-warning {
+    @apply btn border-warning/40 bg-warning/10 text-warning hover:bg-warning/20;
+  }
+  .input {
+    @apply w-full bg-panel2 border border-border rounded-sm px-2.5 py-1.5 text-sm
+           focus:border-accent focus:outline-none placeholder:text-muted;
+  }
+  .label {
+    @apply text-xs uppercase tracking-wider text-muted mb-1 block;
+  }
+  .badge {
+    @apply inline-flex items-center px-1.5 py-0.5 text-[11px] font-medium uppercase tracking-wide rounded-sm;
+  }
+  .badge-blue    { @apply badge bg-accent/15  text-accent  border border-accent/30; }
+  .badge-yellow  { @apply badge bg-warning/15 text-warning border border-warning/30; }
+  .badge-green   { @apply badge bg-success/15 text-success border border-success/30; }
+  .badge-red     { @apply badge bg-danger/15  text-danger  border border-danger/30; }
+  .badge-gray    { @apply badge bg-white/5    text-muted   border border-border; }
+  .table-head {
+    @apply text-[11px] uppercase tracking-wider text-muted text-left py-2 px-3 bg-panel2 border-b border-border;
+  }
+  .table-cell {
+    @apply py-2 px-3 text-sm border-b border-border/60;
+  }
+}
+
+/* Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 38px;
+  height: 20px;
+}
+.switch input { display: none; }
+.slider {
+  position: absolute; inset: 0;
+  background: #2a2a2a;
+  border: 1px solid #2a2a2a;
+  border-radius: 999px;
+  transition: background .15s;
+  cursor: pointer;
+}
+.slider::before {
+  content: '';
+  position: absolute;
+  height: 14px; width: 14px;
+  left: 2px; top: 2px;
+  background: #e0e0e0;
+  border-radius: 50%;
+  transition: transform .15s;
+}
+.switch input:checked + .slider { background: #3b82f6; border-color: #3b82f6; }
+.switch input:checked + .slider::before { transform: translateX(18px); }

@@ -1,5 +1,9 @@
 node_modules/
+src/ui/node_modules/
+src/ui/dist/
+release/
 .env
+.env.*
 logs/
 screenshots/
 cookies/
@@ -8,12 +12,24 @@ cookies/
 *.db-wal
 park.js
 unpark.js
--e 
+
 # Environment and credential files
-.env
-.env.*
 *.env
 credentials.json
 *.pem
 *.key
 .credentials
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Logs / cache
+*.log
+.pytest_cache/
+test_reports/
+
+# Build artefacts
+*.tgz

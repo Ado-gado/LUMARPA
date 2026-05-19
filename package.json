@@ -1,26 +1,94 @@
 {
-  "name": "account-registration-automation",
+  "name": "luma-registration-bot",
   "version": "1.0.0",
-  "description": "Серверное Node.js-приложение для автоматизации регистрации аккаунтов с использованием Playwright, AdsPower, Capsolver и firstmail.ltd",
-  "main": "src/index.js",
+  "description": "Автоматизация регистрации аккаунтов: Playwright + AdsPower + Capsolver + GMX IMAP + Electron UI",
+  "main": "electron/main.js",
   "scripts": {
-    "start": "node src/index.js",
-    "dev": "node --watch src/index.js",
-    "db": "node scripts/db.js",
-    "stats": "node scripts/db.js stats"
+    "start":          "node src/index.js",
+    "dev":            "node --watch src/index.js",
+    "db":             "node scripts/db.js",
+    "stats":          "node scripts/db.js stats",
+
+    "api":            "node src/api.js",
+    "ui:install":     "cd src/ui && yarn install",
+    "ui:dev":         "cd src/ui && yarn dev",
+    "ui:build":       "cd src/ui && yarn build",
+
+    "dev:all":        "concurrently -k -n API,UI -c blue,green \"yarn api\" \"yarn ui:dev\"",
+    "build:electron": "yarn ui:build",
+    "electron":       "electron .",
+    "electron:dev":   "concurrently -k -n API,ELE -c blue,magenta \"yarn api\" \"wait-on http://127.0.0.1:3001 && electron .\"",
+
+    "dist":           "yarn build:electron && electron-builder --win nsis",
+    "dist:dir":       "yarn build:electron && electron-builder --win nsis --dir"
   },
   "dependencies": {
-    "better-sqlite3": "^12.9.0",
-    "dotenv": "^16.4.5",
-    "imapflow": "1.3.3",
-    "mailparser": "3.9.8",
-    "playwright": "^1.44.0",
-    "socks": "2.8.3",
-    "winston": "^3.13.0",
-    "winston-daily-rotate-file": "^5.0.0"
+    "better-sqlite3":              "^12.9.0",
+    "cors":                        "^2.8.5",
+    "dotenv":                      "^16.4.5",
+    "express":                     "^4.21.2",
+    "imapflow":                    "1.3.3",
+    "mailparser":                  "3.9.8",
+    "playwright":                  "^1.44.0",
+    "socks":                       "2.8.3",
+    "winston":                     "^3.13.0",
+    "winston-daily-rotate-file":   "^5.0.0"
+  },
+  "devDependencies": {
+    "concurrently":      "^9.1.0",
+    "electron":          "^33.2.1",
+    "electron-builder":  "^25.1.8",
+    "wait-on":           "^8.0.1"
   },
   "engines": {
     "node": ">=18.0.0"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "build": {
+    "appId": "com.lumabot.registration",
+    "productName": "Luma Registration Bot",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/better-sqlite3/**/*"
+    ],
+    "directories": {
+      "output": "release",
+      "buildResources": "assets"
+    },
+    "files": [
+      "electron/**/*",
+      "src/**/*",
+      "scripts/**/*",
+      "package.json",
+      "!src/ui/node_modules",
+      "!src/ui/src",
+      "!src/ui/index.html",
+      "!src/ui/vite.config.js",
+      "!src/ui/tailwind.config.js",
+      "!src/ui/postcss.config.js",
+      "!src/ui/package.json",
+      "!src/ui/yarn.lock",
+      "src/ui/dist/**/*"
+    ],
+    "extraResources": [
+      { "from": "config/.env.example", "to": ".env.example" }
+    ],
+    "win": {
+      "target": [
+        { "target": "nsis", "arch": ["x64"] }
+      ],
+      "icon": "assets/icon.ico",
+      "artifactName": "LumaBot-Setup-${version}.exe"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowToChangeInstallationDirectory": true,
+      "allowElevation": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "Luma Registration Bot",
+      "deleteAppDataOnUninstall": false
+    }
+  }
 }
