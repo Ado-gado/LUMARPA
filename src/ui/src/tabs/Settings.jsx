@@ -65,17 +65,42 @@ export default function Settings() {
         {items.map(f => (
           <div key={f.key} className={f.fullWidth ? 'col-span-2' : ''}>
             <label className="label">{f.label}</label>
-            <input
-              data-testid={`settings-${f.key}`}
-              type={f.type || 'text'}
-              min={f.min}
-              max={f.max}
-              readOnly={f.readOnly}
-              placeholder={f.placeholder || ''}
-              value={values[f.key] ?? ''}
-              onChange={e => set(f.key, e.target.value)}
-              className={`input font-mono ${f.readOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
-            />
+            {f.key === 'COOKIES_DIR' ? (
+              <div className="flex gap-2">
+                <input
+                  data-testid={`settings-${f.key}`}
+                  type="text"
+                  placeholder={f.placeholder || ''}
+                  value={values[f.key] ?? ''}
+                  onChange={e => set(f.key, e.target.value)}
+                  className="input font-mono flex-1"
+                />
+                <button
+                  onClick={async () => {
+                    if (window.electron?.selectFolder) {
+                      const folder = await window.electron.selectFolder();
+                      if (folder) set(f.key, folder);
+                    }
+                  }}
+                  className="btn-secondary px-3 py-1 text-xs whitespace-nowrap"
+                  title="Выбрать папку"
+                >
+                  📁 Обзор
+                </button>
+              </div>
+            ) : (
+              <input
+                data-testid={`settings-${f.key}`}
+                type={f.type || 'text'}
+                min={f.min}
+                max={f.max}
+                readOnly={f.readOnly}
+                placeholder={f.placeholder || ''}
+                value={values[f.key] ?? ''}
+                onChange={e => set(f.key, e.target.value)}
+                className={`input font-mono ${f.readOnly ? 'opacity-60 cursor-not-allowed' : ''}`}
+              />
+            )}
           </div>
         ))}
       </div>

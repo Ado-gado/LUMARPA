@@ -14,6 +14,7 @@
 const path        = require('path');
 const fs          = require('fs');
 const { app, BrowserWindow, Tray, Menu, shell, dialog } = require('electron');
+const { autoUpdater } = require('electron-updater');
 
 // Скрываем консольное окно на Windows (если запущено через .exe — это уже делает GUI subsystem)
 app.commandLine.appendSwitch('disable-features', 'AutofillAddressPolling');
@@ -140,6 +141,39 @@ if (!gotLock) {
     startApiServer();
     createWindow();
     createTray();
+
+    // Автообновление через GitHub Releases
+    if (app.isPackaged) {
+      autoUpdater.checkForUpdatesAndNotify();
+      autoUpdater.on('update-available', () => {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'Доступно обновление',
+          message: 'Найдена новая версия. Она будет загружена в фоне.',
+          buttons: ['OK'],
+        });
+      });
+      autoUpdater.on('update-downloaded', () => {
+        dialog.showMessageBox(mainWindow, {
+          type: 'info',
+          title: 'Обновление готово',
+          message: 'Обновление загружено. Перезапустить приложение сейчас?',
+          buttons: ['Перезапустить', 'Позже'],
+        }).then(result => {
+          if (result.response === 0) autoUpdater.quitAndInstall();
+        });
+      });
+    }
+
+    // Диалог выбора папки — вызывается из UI через window.electron.selectFolder()
+    const { ipcMain } = require('electron');
+    ipcMain.handle('select-folder', async () => {
+      const result = await dialog.showOpenDialog(mainWindow, {
+        properties: ['openDirectory'],
+        title: 'Выберите папку',
+      });
+      return result.canceled ? null : result.filePaths[0];
+    });
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
