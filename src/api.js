@@ -93,6 +93,7 @@ function parseProxyLines(text) {
     .map(l => l.trim())
     .filter(l => l && !l.startsWith('#'))
     .map(l => {
+      // Формат: socks5://user:pass@host:port
       if (l.includes('://')) {
         try {
           const u = new URL(l);
@@ -105,6 +106,21 @@ function parseProxyLines(text) {
           };
         } catch { return null; }
       }
+      // Формат: user:pass@host:port
+      if (l.includes('@')) {
+        const atIdx = l.lastIndexOf('@');
+        const credentials = l.slice(0, atIdx);
+        const hostPort    = l.slice(atIdx + 1);
+        const colonIdx    = credentials.indexOf(':');
+        const username    = colonIdx >= 0 ? credentials.slice(0, colonIdx) : credentials;
+        const password    = colonIdx >= 0 ? credentials.slice(colonIdx + 1) : null;
+        const parts       = hostPort.split(':');
+        const host        = parts[0];
+        const port        = parseInt(parts[1], 10);
+        if (!host || !port) return null;
+        return { protocol: 'socks5', host, port, username, password };
+      }
+      // Формат: host:port[:user[:pass]]
       const p = l.split(':');
       if (p.length < 2) return null;
       const port = parseInt(p[1], 10);
